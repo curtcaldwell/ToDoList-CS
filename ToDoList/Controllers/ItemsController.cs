@@ -5,17 +5,25 @@ namespace ToDoList.Controllers
 {
   public class ItemsController : Controller
   {
-    [HttpGet("/items")]
-    public ActionResult Index()
-    {
-      Item newItem = new Item(Request.Query["new-item"]);
-      return View(newItem);
-    }
+    // [HttpPost("/items")]
+    // public ActionResult Date()
+    // {
+    //   Item newItem = new Item(Request.Form["new-item"], Request.Form["date"]);
+    //   newItem.Save();
+    //   return View("Index", Item.GetAll());
+    // }
 
     [HttpGet("/items/new")]
     public ActionResult CreateForm()
     {
       return View();
     }
+    [HttpPost("/items")]
+    public ActionResult DateOrder()
+        {
+          Item newItem = new Item(Request.Form["new-item"], Request.Form["date"]);
+          newItem.Save();
+          return View("Index", Item.DateOrder());
+        }
   }
 }

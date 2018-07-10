@@ -7,10 +7,12 @@
     </head>
     <body>
       <h1>To Do List</h1>
-      <form action="/items">
+      <form action="/items" method="post">
         <label for="new-item">Add a new item</label>
         <input id="new-item" name="new-item" type="text">
         <button type="submit">Submit</button>
+        <label for="date"></label>
+        <input id="date" type="date" name="date">
       </form>
     </body>
     </html>
