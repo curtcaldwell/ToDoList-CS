@@ -9,7 +9,6 @@ namespace ToDoList.Models
   {
     private string _description;
     private int _id;
-    // private static List<Item> _instances = new List<Item> {};
 
     public Item (string description, int Id = 0)
     {
@@ -19,6 +18,10 @@ namespace ToDoList.Models
     public string GetDescription()
     {
       return _description;
+    }
+    public int GetId()
+    {
+      return _id;
     }
     public void SetDescription(string newDescription)
     {
@@ -48,40 +51,55 @@ namespace ToDoList.Models
     }
     public void Save()
     {
-      _instances.Add(this);
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO `items` (`description`) VALUES (@ItemDescription);";
+
+      MySqlParameter description = new MySqlParameter();
+      description.ParameterName = "@ItemDescription";
+      description.Value = this._description;
+      cmd.Parameters.Add(description);
+
+      cmd.ExecuteNonQuery();
+      _id = (int) cmd.LastInsertedId;
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
     }
-    public static void ClearAll()
+    public override bool Equals(System.Object otherItem)
     {
-      _instances.Clear();
+      if (!(otherItem is Item))
+      {
+        return false;
+      }
+      else
+      {
+        Item newItem = (Item) otherItem;
+        bool idEquality = (this.GetId() == newItem.GetId());
+        bool descriptionEquality = (this.GetDescription() == newItem.GetDescription());
+        return (idEquality && descriptionEquality);
+      }
+    }
+    public static void DeleteAll()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"DELETE FROM items;";
+
+      cmd.ExecuteNonQuery();
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
     }
   }
-
-  // public class Program
-  // {
-  //   public static void Main()
-  //   {
-  //     Console.WriteLine("Would you like to add an item or view the to-do list? (Add/View) ");
-  //     string UserInput = Console.ReadLine();
-  //     if (UserInput == "Add" || UserInput == "add")
-  //     {
-  //       Console.WriteLine("Please enter a description of your to-do item: ");
-  //       string newItemDescription = Console.ReadLine();
-  //       Item newItem = new Item(newItemDescription);
-  //       newItem.Save();
-  //     }
-  //     else if (UserInput == "View" || UserInput == "view")
-  //     {
-  //       foreach (Item item in Item.GetAll())
-  //       {
-  //         Console.WriteLine(item.GetDescription());
-  //       }
-  //     }
-  //     else
-  //     {
-  //       Console.WriteLine("Please type view or add");
-  //     }
-  //     Console.WriteLine("--------");
-  //     Main();
-  //   }
-  // }
 }
